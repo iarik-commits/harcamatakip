@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#3498db">
+    <title>Harcama Takip</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #e74c3c;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --warning-color: #f39c12;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --info-color: #3498db;
+            --white: #ffffff;
+            --black: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .budget-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .budget-item {
+            text-align: center;
+        }
+
+        .budget-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .budget-value {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .category-btn {
+            background-color: var(--white);
+            color: var(--dark-color);
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 90px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-btn:active {
+            transform: scale(0.98);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+        }
+
+        .category-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .category-name {
+            font-weight: 500;
+        }
+
+        .category-total {
+            font-size: 0.8rem;
+            margin-top: 3px;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            background-color: var(--white);
+            color: var(--dark-color);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn.camera {
+            background-color: var(--accent-color);
+            color: var(--white);
+        }
+
+        .input-section {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 0 10px 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .input-section.visible {
+            display: block;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--dark-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+        }
+
+        .save-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--white);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
+        }
+
+        .camera-container {
+            display: none;
+            text-align: center;
+            padding: 15px;
+            background-color: var(--white);
+            border-radius: 12px;
+            margin: 0 10px 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .camera-container.visible {
+            display: block;
+        }
+
+        #cameraPreview {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            background-color: #000;
+            margin-bottom: 10px;
+        }
+
+        #captureBtn {
+            background: linear-gradient(135deg, var(--accent-color), var(--danger-color));
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+
+        #captureBtn:active {
+            transform: scale(0.98);
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: var(--white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .no-expenses {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .expense-list {
+            background-color: var(--white);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 0 10px 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .expense-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+
+        .expense-date {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .expense-amount {
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+
+        .expense-type {
+            font-size: 0.7rem;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        .expense-percentage {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .category-total-container {
+            font-weight: bold;
+            text-align: right;
+            padding-top: 10px;
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-amount {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--white), var(--light-color));
+            color: var(--dark-color);
+            padding: 10px 15px;
+            text-align: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            font-size: 0.9rem;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+
+        .footer-value {
+            font-weight: bold;
+        }
+
+        .remaining-budget {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .warning {
+            color: var(--warning-color);
+        }
+
+        .danger {
+            color: var(--danger-color);
+        }
+
+        .camera-instructions {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--dark-color);
+            text-align: center;
+        }
+
+        @media (max-width: 400px) {
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .category-btn {
+                height: 80px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animasyonlar */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <button class="back-btn" id="backBtn" style="display: none;">←</button>
+            <h1>Harcama Takip</h1>
+            <div class="budget-info">
+                <div class="budget-item">
+                    <div class="budget-label">Toplam Bütçe</div>
+                    <div class="budget-value" id="totalBudget">375.000 TL</div>
+                </div>
+                <div class="budget-item">
+                    <div class="budget-label">Kalan Bütçe</div>
+                    <div class="budget-value" id="remainingBudget">375.000 TL</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="category-grid">
+            <button class="category-btn" data-category="NS">
+                <div class="category-icon">💼</div>
+                <div class="category-name">NS</div>
+                <div class="category-total" id="NS-total">0 TL</div>
+            </button>
+            <button class="category-btn" data-category="DGA">
+                <div class="category-icon">🍽️</div>
+                <div class="category-name">DGA</div>
+                <div class="category-total" id="DGA-total">0 TL</div>
+            </button>
+            <button class="category-btn" data-category="EGA">
+                <div class="category-icon">🛒</div>
+                <div class="category-name">EGA</div>
+                <div class="category-total" id="EGA-total">0 TL</div>
+            </button>
+            <button class="category-btn" data-category="ÜBY">
+                <div class="category-icon">🚗</div>
+                <div class="category-name">ÜBY</div>
+                <div class="category-total" id="ÜBY-total">0 TL</div>
+            </button>
+            <button class="category-btn" data-category="BPA">
+                <div class="category-icon">🏠</div>
+                <div class="category-name">BPA</div>
+                <div class="category-total" id="BPA-total">0 TL</div>
+            </button>
+            <button class="category-btn" data-category="Kitap">
+                <div class="category-icon">📚</div>
+                <div class="category-name">Kitap</div>
+                <div class="category-total" id="Kitap-total">0 TL</div>
+            </button>
+        </div>
+
+        <div class="action-buttons" id="actionButtons" style="display: none;">
+            <button class="action-btn" id="cameraBtn">
+                <span>📷 Kamera</span>
+            </button>
+            <button class="action-btn camera" id="manualBtn">
+                <span>✍️ Manuel</span>
+            </button>
+        </div>
+
+        <div class="input-section" id="manualInput">
+            <div class="input-group">
+                <label for="amountInput">Tutar (TL)</label>
+                <input type="number" id="amountInput" placeholder="Tutar girin">
+            </div>
+            <button class="save-btn" id="saveManual">Kaydet</button>
+        </div>
+
+        <div class="camera-container" id="cameraView">
+            <video id="cameraPreview" autoplay playsinline></video>
+            <button id="captureBtn">Fotoğraf Çek</button>
+            <div class="camera-instructions">
+                Fişinizi kameraya gösterin ve "Fotoğraf Çek" butonuna basın
+            </div>
+        </div>
+
+        <div class="expense-list" id="expenseList">
+            <h3 id="expenseTitle">Harcamalar</h3>
+            <div id="expenses">
+                <div class="no-expenses">Henüz harcama kaydedilmedi</div>
+            </div>
+            <div class="category-total-container">
+                <span>Toplam:</span>
+                <span class="total-amount" id="categoryTotal">0 TL</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-row">
+                <span class="footer-label">Toplam Harcama Tutarı:</span>
+                <span class="footer-value" id="totalAmount">0 TL</span>
+            </div>
+            <div class="footer-row">
+                <span class="footer-label">Kalan Bütçe:</span>
+                <span class="footer-value remaining-budget" id="remainingBudgetFooter">375.000 TL</span>
+            </div>
+        </div>
+    </footer>
+
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <!-- Tesseract.js kütüphanesi -->
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js'></script>
+
+    <script>
+        // Kategorileri ve harcamaları saklamak için
+        const categories = {
+            NS: { expenses: [], total: 0 },
+            DGA: { expenses: [], total: 0 },
+            EGA: { expenses: [], total: 0 },
+            ÜBY: { expenses: [], total: 0 },
+            BPA: { expenses: [], total: 0 },
+            Kitap: { expenses: [], total: 0 }
+        };
+
+        // Toplam bütçe
+        const TOTAL_BUDGET = 375000;
+
+        let currentCategory = null;
+        let stream = null;
+
+        // Toplam harcamaları hesapla
+        function calculateTotalExpenses() {
+            return Object.values(categories).reduce((sum, category) => sum + category.total, 0);
+        }
+
+        // Kalan bütçeyi hesapla
+        function calculateRemainingBudget() {
+            return TOTAL_BUDGET - calculateTotalExpenses();
+        }
+
+        // Toplamı güncelle
+        function updateTotalAmount() {
+            const total = calculateTotalExpenses();
+            const remaining = calculateRemainingBudget();
+
+            // Toplam harcama tutarını güncelle
+            document.getElementById('totalAmount').textContent = `${total.toFixed(2)} TL`;
+
+            // Kalan bütçeyi güncelle
+            document.getElementById('remainingBudget').textContent = `${remaining.toFixed(2)} TL`;
+            document.getElementById('remainingBudgetFooter').textContent = `${remaining.toFixed(2)} TL`;
+
+            // Kalan bütçeye göre renk değiştir
+            const remainingElement = document.getElementById('remainingBudgetFooter');
+            const percentage = (remaining / TOTAL_BUDGET) * 100;
+
+            if (percentage < 20) {
+                remainingElement.classList.remove('remaining-budget', 'warning');
+                remainingElement.classList.add('danger');
+            } else if (percentage < 50) {
+                remainingElement.classList.remove('remaining-budget', 'danger');
+                remainingElement.classList.add('warning');
+            } else {
+                remainingElement.classList.remove('warning', 'danger');
+                remainingElement.classList.add('remaining-budget');
+            }
+
+            // Her kategori toplamını güncelle
+            Object.entries(categories).forEach(([category, data]) => {
+                document.getElementById(`${category}-total`).textContent = `${data.total.toFixed(2)} TL`;
+            });
+        }
+
+        // Kategori butonlarına tıklama olayları
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Tüm butonların aktif durumunu kaldır
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+
+                // Tıklanan butonu aktif yap
+                this.classList.add('active');
+
+                // Seçilen kategoriyi kaydet
+                currentCategory = this.dataset.category;
+
+                // Geri butonunu göster
+                document.getElementById('backBtn').style.display = 'flex';
+
+                // Eylem butonlarını göster
+                document.getElementById('actionButtons').style.display = 'flex';
+
+                // Harcama listesini güncelle
+                updateExpenseList(currentCategory);
+
+                // Footer yüzdesini güncelle
+                updateFooterPercentage();
+            });
+        });
+
+        // Geri butonu
+        document.getElementById('backBtn').addEventListener('click', function() {
+            // Tüm butonların aktif durumunu kaldır
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Geri butonunu gizle
+            this.style.display = 'none';
+
+            // Eylem butonlarını gizle
+            document.getElementById('actionButtons').style.display = 'none';
+
+            // Manuel giriş ve kamera görünümlerini gizle
+            document.getElementById('manualInput').classList.remove('visible');
+            document.getElementById('cameraView').classList.remove('visible');
+
+            // Kamera akışını durdur
+            stopCamera();
+
+            // Harcama listesini temizle
+            document.getElementById('expenses').innerHTML = '<div class="no-expenses">Henüz harcama kaydedilmedi</div>';
+            document.getElementById('categoryTotal').textContent = '0 TL';
+
+            // Footer yüzdesini sıfırla
+            document.getElementById('currentPercentage').textContent = '%0';
+        });
+
+        // Kamera butonuna tıklama olayı
+        document.getElementById('cameraBtn').addEventListener('click', function() {
+            // Manuel giriş alanını gizle
+            document.getElementById('manualInput').classList.remove('visible');
+
+            // Kamera görünümünü göster
+            document.getElementById('cameraView').classList.add('visible');
+
+            // Kamera akışını başlat
+            startCamera();
+        });
+
+        // Manuel butonuna tıklama olayı
+        document.getElementById('manualBtn').addEventListener('click', function() {
+            // Kamera görünümünü gizle
+            document.getElementById('cameraView').classList.remove('visible');
+
+            // Manuel giriş alanını göster
+            document.getElementById('manualInput').classList.add('visible');
+        });
+
+        // Manuel kaydet butonuna tıklama olayı
+        document.getElementById('saveManual').addEventListener('click', function() {
+            const amount = parseFloat(document.getElementById('amountInput').value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('Lütfen geçerli bir tutar girin');
+                return;
+            }
+
+            // Yeni harcama oluştur
+            const newExpense = {
+                date: new Date().toLocaleString(),
+                amount: amount,
+                type: 'manuel'
+            };
+
+            // Harcamayı kategoriye ekle
+            categories[currentCategory].expenses.push(newExpense);
+            categories[currentCategory].total += amount;
+
+            // Giriş alanını temizle
+            document.getElementById('amountInput').value = '';
+
+            // Harcama listesini güncelle
+            updateExpenseList(currentCategory);
+
+            // Toplamı güncelle
+            updateTotalAmount();
+
+            // Footer yüzdesini güncelle
+            updateFooterPercentage();
+        });
+
+        // Fotoğraf çek butonuna tıklama olayı
+        document.getElementById('captureBtn').addEventListener('click', function() {
+            const video = document.getElementById('cameraPreview');
+            const canvas = document.getElementById('canvas');
+            const context = canvas.getContext('2d');
+
+            // Video boyutlarını ayarla
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // Videodan kare yakala
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Fotoğrafı işle
+            processReceiptImage(canvas);
+        });
+
+        // Fiş fotoğrafını işle
+        async function processReceiptImage(canvas) {
+            try {
+                // Kamera akışını durdur
+                stopCamera();
+
+                // Kamera görünümünü gizle
+                document.getElementById('cameraView').classList.remove('visible');
+
+                // Tesseract.js ile metin tanıma
+                const { data: { text } } = await Tesseract.recognize(
+                    canvas,
+                    'tur',
+                    {
+                        logger: m => console.log(m),
+                        tessedit_char_whitelist: '0123456789.,'
+                    }
+                );
+
+                // Metinden tutarları çıkart
+                const amounts = extractAmounts(text);
+                console.log("Tanımlanan tutarlar:", amounts);
+
+                if (amounts.length === 0) {
+                    alert("Fişte tutar bulunamadı. Lütfen daha net bir fotoğraf çekin.");
+                    return;
+                }
+
+                // En büyük tutarı al (genellikle toplam tutar)
+                const totalAmount = Math.max(...amounts);
+                console.log("Toplam tutar:", totalAmount);
+
+                // KDV tutarını bul
+                const kdvAmount = findKDVAmount(text);
+                console.log("KDV tutarı:", kdvAmount);
+
+                // KDV hariç tutarı hesapla
+                const amountWithoutKDV = totalAmount - kdvAmount;
+                console.log("KDV hariç tutar:", amountWithoutKDV);
+
+                // Yeni harcama oluştur
+                const newExpense = {
+                    date: new Date().toLocaleString(),
+                    amount: amountWithoutKDV,
+                    type: 'kamera',
+                    originalAmount: totalAmount,
+                    kdvAmount: kdvAmount
+                };
+
+                // Harcamayı kategoriye ekle
+                categories[currentCategory].expenses.push(newExpense);
+                categories[currentCategory].total += amountWithoutKDV;
+
+                // Harcama listesini güncelle
+                updateExpenseList(currentCategory);
+
+                // Toplamı güncelle
+                updateTotalAmount();
+
+                // Footer yüzdesini güncelle
+                updateFooterPercentage();
+
+                alert(`Fiş işlendi! KDV hariç tutar: ${amountWithoutKDV.toFixed(2)} TL`);
+
+            } catch (error) {
+                console.error("Fiş işleme hatası:", error);
+                alert("Fiş işlenirken bir hata oluştu. Lütfen tekrar deneyin.");
+            }
+        }
+
+        // Metinden tutarları çıkart
+        function extractAmounts(text) {
+            // Sayıları ve ondalık sayıları bul
+            const amountRegex = /(\d+[.,]?\d*)/g;
+            const matches = text.match(amountRegex);
+
+            if (!matches) return [];
+
+            // Sayıları temizle ve dönüştür
+            return matches.map(match => {
+                // Nokta ve virgülleri değiştir
+                const cleaned = match.replace(',', '.');
+                return parseFloat(cleaned);
+            }).filter(amount => !isNaN(amount) && amount > 0);
+        }
+
+        // Metinden KDV tutarını bul
+        function findKDVAmount(text) {
+            // KDV kelimesini ve ardından gelen sayıyı bul
+            const kdvRegex = /KDV\s*[:=]?\s*(\d+[.,]?\d*)/i;
+            const match = text.match(kdvRegex);
+
+            if (match && match[1]) {
+                const cleaned = match[1].replace(',', '.');
+                return parseFloat(cleaned);
+            }
+
+            // Alternatif olarak "KDV TOP" gibi ifadeleri ara
+            const kdvTopRegex = /KDV\s*TOP\s*[:=]?\s*(\d+[.,]?\d*)/i;
+            const topMatch = text.match(kdvTopRegex);
+
+            if (topMatch && topMatch[1]) {
+                const cleaned = topMatch[1].replace(',', '.');
+                return parseFloat(cleaned);
+            }
+
+            // Eğer KDV tutarı bulunamazsa, varsayılan olarak toplamın %18'ini döndür
+            const amounts = extractAmounts(text);
+            if (amounts.length > 0) {
+                const total = Math.max(...amounts);
+                return total * 0.18; // Varsayılan KDV oranı %18
+            }
+
+            return 0;
+        }
+
+        // Harcama listesini güncelle
+        function updateExpenseList(category) {
+            const expenseList = document.getElementById('expenses');
+            const expenseTitle = document.getElementById('expenseTitle');
+            const categoryTotal = document.getElementById('categoryTotal');
+            const totalExpenses = calculateTotalExpenses();
+
+            // Başlığı güncelle
+            expenseTitle.textContent = `${category} Harcamaları`;
+
+            // Listeyi temizle
+            expenseList.innerHTML = '';
+
+            // Kategorinin harcamalarını listele
+            if (categories[category].expenses.length === 0) {
+                expenseList.innerHTML = '<div class="no-expenses">Henüz harcama kaydedilmedi</div>';
+                categoryTotal.textContent = '0 TL';
+                return;
+            }
+
+            categories[category].expenses.forEach(expense => {
+                const percentage = totalExpenses > 0 ? (expense.amount / totalExpenses * 100).toFixed(1) : 0;
+
+                const expenseItem = document.createElement('div');
+                expenseItem.className = 'expense-item fade-in';
+                expenseItem.innerHTML = `
+                    <div>
+                        <div class="expense-date">${expense.date}</div>
+                        <div class="expense-amount">${expense.amount.toFixed(2)} TL</div>
+                        ${expense.type === 'kamera' ? `
+                        <div style="font-size: 0.7rem; color: #7f8c8d; margin-top: 3px;">
+                            (Toplam: ${expense.originalAmount.toFixed(2)} TL, KDV: ${expense.kdvAmount.toFixed(2)} TL)
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div>
+                        <div class="expense-type">${expense.type}</div>
+                        <span class="expense-percentage">%${percentage}</span>
+                    </div>
+                `;
+                expenseList.appendChild(expenseItem);
+            });
+
+            // Kategori toplamını güncelle
+            categoryTotal.textContent = `${categories[category].total.toFixed(2)} TL`;
+        }
+
+        // Footer yüzdesini güncelle
+        function updateFooterPercentage() {
+            const totalExpenses = calculateTotalExpenses();
+            if (!currentCategory || totalExpenses === 0) {
+                document.getElementById('currentPercentage').textContent = '%0';
+                return;
+            }
+
+            const categoryTotal = categories[currentCategory].total;
+            const percentage = (categoryTotal / totalExpenses * 100).toFixed(1);
+            document.getElementById('currentPercentage').textContent = `%${percentage}`;
+        }
+
+        // Kamera akışını başlat
+        function startCamera() {
+            const video = document.getElementById('cameraPreview');
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
+                })
+                .then(function(mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = mediaStream;
+                    video.play();
+                })
+                .catch(function(error) {
+                    console.error('Kamera erişimi hatası:', error);
+                    alert('Kamera erişimi hatası: ' + error.message);
+                });
+            } else {
+                alert('Bu tarayıcı kamera erişimini desteklemiyor');
+            }
+        }
+
+        // Kamera akışını durdur
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => {
+                    track.stop();
+                });
+                document.getElementById('cameraPreview').srcObject = null;
+            }
+        }
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            updateTotalAmount();
+        });
+    </script>
+</body>
+</html>
